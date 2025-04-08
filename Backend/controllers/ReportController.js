@@ -1,4 +1,4 @@
-const { sequelize } = require('../config/sqlDB');
+const { sequelize } = require('../config/db');
 const Product = require('../models/mongo/Product');
 
 const topSpenders = async (req, res) => {
@@ -19,7 +19,6 @@ const topSpenders = async (req, res) => {
   }
 };
 
-// Sales summary by category (MongoDB)
 const salesByCategory = async (req, res) => {
   try {
     const result = await Product.aggregate([

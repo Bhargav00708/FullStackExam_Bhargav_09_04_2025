@@ -2,16 +2,22 @@ const app = require("./app");
 const dotenv = require("dotenv");
 const sequelize = require("./config/db");
 const connectMongo = require("./config/mongo");
-const User = require("./models/sql/User");
+
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectMongo();
+    await sequelize.sync();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
 
-(async () => {
-  await sequelize.sync(); // Creates tables
-  await connectMongo(); // Connect to Mongo
-})();
+startServer();
