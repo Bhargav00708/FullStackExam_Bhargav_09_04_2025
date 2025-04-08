@@ -31,7 +31,7 @@ export default function CheckoutPage() {
       })),
     };
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

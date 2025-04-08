@@ -13,7 +13,7 @@ const ProductCard = ({ product }: Props) => {
       <h3 className="font-bold text-lg">{product.name}</h3>
       <p className="text-sm text-gray-600">{product.category}</p>
       <p className="text-green-600 font-semibold">${product.price}</p>
-      <Link href={`/product/${product._id}`} className="text-blue-500 underline">
+      <Link href={`/products/${product._id}`} className="text-blue-500 underline">
         View Details
       </Link>
     </div>

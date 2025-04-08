@@ -8,6 +8,7 @@ const checkout = async (req, res) => {
 
   try {
     const cart = await Cart.findOne({ userId }).populate("items.productId");
+    
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ msg: "Cart is empty" });
     }

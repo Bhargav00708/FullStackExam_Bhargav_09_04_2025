@@ -1,6 +1,20 @@
-// app/page.tsx
-import { redirect } from 'next/navigation';
+'use client';
 
-export default function Home() {
-  redirect('/products');
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      router.push('/products');
+    } else {
+      router.push('/login');
+    }
+  }, [router]);
+
+  return null;
 }
