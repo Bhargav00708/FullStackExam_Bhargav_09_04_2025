@@ -1,11 +1,8 @@
----
-
-```markdown
 # 🛍️ Full-Stack E-Commerce App
 
 A full-stack e-commerce platform built with:
 
-- **Frontend**: Next.js 14 (App Router) + TypeScript
+- **Frontend**: Next.js 15 (App Router) + TypeScript
 - **Backend**: Node.js + Express
 - **Databases**: PostgreSQL (Users, Orders), MongoDB (Products)
 - **Authentication**: JWT
