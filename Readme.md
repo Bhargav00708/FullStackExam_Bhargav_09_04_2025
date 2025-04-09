@@ -51,9 +51,6 @@ JWT_SECRET=your_jwt_secret
 ```bash
 npm start
 ```
-
-Server runs at: `http://localhost:5000`
-
 ---
 
 ## 🌐 Frontend Setup
