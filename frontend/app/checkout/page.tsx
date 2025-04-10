@@ -6,48 +6,68 @@ import { Product } from '@/types';
 
 export default function CheckoutPage() {
   const [cart, setCart] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   useEffect(() => {
-    const stored = localStorage.getItem('cart');
-    if (stored) setCart(JSON.parse(stored));
-  }, []);
-
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  const handleCheckout = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Please login first');
-      router.push('/login');
-      return;
-    }
-
-    const payload = {
-      items: cart.map((item) => ({
-        product_id: item._id,
-        quantity: 1, // You can improve this later
-        price: item.price,
-      })),
+    const fetchCart = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        setCart(data.items);
+      } catch (err) {
+        console.error('Error fetching cart:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
+    if (token) fetchCart();
+    else {
+      alert('Please login to proceed to checkout.');
+      router.push('/login');
+    }
+  }, [token, router]);
 
-    if (res.ok) {
-      alert('Order placed successfully!');
-      localStorage.removeItem('cart');
-      router.push('/orders');
-    } else {
+  const total = cart.reduce((sum, item) => sum + item.productId.price, 0);
+
+  const handleCheckout = async () => {
+    try {
+      const payload = {
+        items: cart.map((item) => ({
+          product_id: item.productId._id,
+          quantity: 1,
+          price: item.productId.price,
+        })),
+      };
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert('Order placed successfully!');
+        router.push('/orders');
+      } else {
+        alert('Failed to place order.');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
       alert('Something went wrong!');
     }
   };
+
+  if (loading) return <p className="p-6">Loading cart...</p>;
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -57,10 +77,10 @@ export default function CheckoutPage() {
       ) : (
         <div className="space-y-4">
           {cart.map((item) => (
-            <div key={item._id} className="flex justify-between items-center border p-4 rounded">
+            <div key={item.productId._id} className="flex justify-between items-center border p-4 rounded">
               <div>
-                <h2 className="font-bold">{item.name}</h2>
-                <p>${item.price}</p>
+                <h2 className="font-bold">{item.productId.name}</h2>
+                <p>${item.productId.price}</p>
               </div>
             </div>
           ))}

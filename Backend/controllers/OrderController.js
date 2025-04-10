@@ -1,5 +1,4 @@
-const { Order } = require("../models/sql/Order");
-const { OrderItem } = require("../models/sql/OrderItem");
+const { Order, OrderItem } = require("../models");
 const Cart = require("../models/mongo/Cart");
 const { clearCart } = require("./CartController");
 
@@ -7,13 +6,19 @@ const checkout = async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    const cart = await Cart.findOne({ userId }).populate("items.productId");
-    
+    const cart = await Cart.findOne({ userId })
+      .populate("items.productId")
+      .lean();
+
+    const total = cart.items.reduce((acc, item) => {
+      return acc + item.productId.price * item.quantity;
+    }, 0);
+
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ msg: "Cart is empty" });
     }
 
-    const order = await Order.create({ userId });
+    const order = await Order.create({ userId, total });
 
     const itemsToInsert = cart.items.map((item) => ({
       orderId: order.id,
@@ -40,7 +45,10 @@ const getOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({
       where: { userId },
-      include: { model: OrderItem },
+      include: {
+        model: OrderItem,
+        as: "items",
+      },
     });
 
     return res.status(200).json(orders);

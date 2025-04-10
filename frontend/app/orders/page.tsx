@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 type OrderItem = {
-  product_id: string;
+  productId: string;
   quantity: number;
   price: number;
 };
 
 type Order = {
   id: number;
-  created_at: string;
+  createdAt: string;
   total: number;
   items: OrderItem[];
 };
@@ -35,6 +35,7 @@ export default function OrdersPage() {
       });
 
       const data = await res.json();
+      
       setOrders(data);
     };
 
@@ -51,12 +52,12 @@ export default function OrdersPage() {
           <div key={order.id} className="border p-4 rounded mb-4">
             <p className="font-bold mb-1">Order #{order.id}</p>
             <p className="text-sm text-gray-500 mb-2">
-              Placed on: {new Date(order.created_at).toLocaleString()}
+              Placed on: {new Date(order.createdAt).toLocaleString()}
             </p>
             <ul className="pl-4 list-disc mb-2">
               {order.items.map((item, idx) => (
                 <li key={idx}>
-                  Product ID: {item.product_id} — Qty: {item.quantity} — ${item.price}
+                  Product ID: {item.productId} - Qty: {item.quantity}
                 </li>
               ))}
             </ul>
