@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import api, { setAuthToken } from '@/lib/api';
+import { AxiosError } from 'axios';
 
 type Props = {
   type: 'login' | 'register';
@@ -15,7 +16,7 @@ const AuthForm = ({ type }: Props) => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await api.post(`/auth/${type}`, {
@@ -23,17 +24,15 @@ const AuthForm = ({ type }: Props) => {
         password,
         ...(type === 'register' && { name }),
       });
+
       const token = res.data.token;
       setAuthToken(token);
       localStorage.setItem('token', token);
-      if(type === 'register') {
-        router.push('/login');
-      }
-      else{
-        router.push('/products');
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Something went wrong');
+
+      router.push(type === 'register' ? '/login' : '/products');
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      setError(error.response?.data?.message || 'Something went wrong');
     }
   };
 
@@ -75,7 +74,6 @@ const AuthForm = ({ type }: Props) => {
         {type === 'login' ? 'Login' : 'Register'}
       </button>
 
-      {/* 👇 Toggle Link */}
       {type === 'login' ? (
         <p className="text-sm text-center">
           Don&apos;t have an account?{' '}
