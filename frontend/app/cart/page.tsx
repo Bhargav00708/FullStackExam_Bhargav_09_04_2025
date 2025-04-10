@@ -56,6 +56,14 @@ export default function CartPage() {
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+
+      <Link
+        href="/products"
+        className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-6"
+      >
+        Continue Shopping
+      </Link>
+
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
