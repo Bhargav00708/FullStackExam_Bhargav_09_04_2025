@@ -2,13 +2,20 @@ import { Product } from '@/types';
 import AddToCartButton from '../../../components/AddToCartButton'; // A separate client component
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function ProductDetailPage({ params }: Props) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${params.id}`, {
+  const { id } = await params;
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
     cache: 'no-store',
   });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch product');
+  }
+
   const product: Product = await res.json();
 
   return (
