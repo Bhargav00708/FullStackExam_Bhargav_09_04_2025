@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Product } from '@/types';
 import Link from 'next/link';
 
+
 export default function CartPage() {
   const [cart, setCart] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
