@@ -14,14 +14,14 @@ export default function CartPage() {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  if (!token || (token && isTokenExpired(token))) {
-    router.push("/login");
-    return;
-  }
-
   useEffect(() => {
     const fetchCart = async () => {
       try {
+        if (!token || (token && isTokenExpired(token))) {
+          router.push("/login");
+          return;
+        }
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -63,7 +63,10 @@ export default function CartPage() {
     }
   };
 
-  const total = (cart ?? []).reduce((sum, p) => sum + (p.productId.price * p.quantity), 0);
+  const total = (cart ?? []).reduce(
+    (sum, p) => sum + p.productId.price * p.quantity,
+    0
+  );
 
   if (loading) return <p className="p-6">Loading cart...</p>;
 

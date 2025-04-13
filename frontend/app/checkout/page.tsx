@@ -12,14 +12,14 @@ export default function CheckoutPage() {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  if (!token || (token && isTokenExpired(token))) {
-    router.push("/login");
-    return;
-  }
-
   useEffect(() => {
     const fetchCart = async () => {
       try {
+        if (!token || (token && isTokenExpired(token))) {
+          router.push("/login");
+          return;
+        }
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
           headers: {
             Authorization: `Bearer ${token}`,
