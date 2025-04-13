@@ -1,5 +1,6 @@
 'use client';
 
+import { isTokenExpired } from '@/app/utils/tokens';
 import { useRouter } from 'next/navigation';
 
 type Props = {
@@ -11,7 +12,8 @@ const AddToCartButton = ({ productId }: Props) => {
 
   const addToCart = async () => {
     const token = localStorage.getItem('token');
-    if (!token) {
+    
+    if (!token || token && isTokenExpired(token)) {
       alert('Please login to add items to your cart.');
       router.push('/login');
       return;

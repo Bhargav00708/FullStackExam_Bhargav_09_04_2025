@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { isTokenExpired } from '../utils/tokens';
 
 type OrderItem = {
   productId: string;
@@ -23,7 +24,8 @@ export default function OrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       const token = localStorage.getItem('token');
-      if (!token) {
+  
+      if (!token || token && isTokenExpired(token)) {
         router.push('/login');
         return;
       }

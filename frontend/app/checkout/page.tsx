@@ -3,12 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/types';
+import { isTokenExpired } from '../utils/tokens';
 
 export default function CheckoutPage() {
   const [cart, setCart] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+  if (!token || token && isTokenExpired(token)) {
+    router.push('/login');
+    return;
+  }
 
   useEffect(() => {
     const fetchCart = async () => {

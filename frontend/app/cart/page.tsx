@@ -1,15 +1,23 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Product } from '@/types';
-import Link from 'next/link';
-
+import { useEffect, useState } from "react";
+import { Product } from "@/types";
+import Link from "next/link";
+import { isTokenExpired } from "../utils/tokens";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const [cart, setCart] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  if (!token || (token && isTokenExpired(token))) {
+    router.push("/login");
+    return;
+  }
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -22,7 +30,7 @@ export default function CartPage() {
         const data = await res.json();
         setCart(data.items);
       } catch (error) {
-        console.error('Error fetching cart:', error);
+        console.error("Error fetching cart:", error);
       } finally {
         setLoading(false);
       }
@@ -33,20 +41,25 @@ export default function CartPage() {
 
   const removeFromCart = async (productId: string) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart/remove`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/remove`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productId }),
+        }
+      );
 
-      if (!res.ok) throw new Error('Failed to remove item');
+      if (!res.ok) throw new Error("Failed to remove item");
 
-      setCart((prev) => prev.filter((item) => item.productId._id !== productId));
+      setCart((prev) =>
+        prev.filter((item) => item.productId._id !== productId)
+      );
     } catch (err) {
-      console.error('Error removing item:', err);
+      console.error("Error removing item:", err);
     }
   };
 
@@ -70,7 +83,10 @@ export default function CartPage() {
       ) : (
         <div className="space-y-4">
           {cart.map((item) => (
-            <div key={item.productId._id} className="flex justify-between items-center border p-4 rounded">
+            <div
+              key={item.productId._id}
+              className="flex justify-between items-center border p-4 rounded"
+            >
               <div>
                 <h2 className="font-bold">{item.productId.name}</h2>
                 <p>${item.productId.price}</p>
