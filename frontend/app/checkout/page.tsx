@@ -1,18 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Product } from '@/types';
-import { isTokenExpired } from '../utils/tokens';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Product } from "@/types";
+import { isTokenExpired } from "../utils/tokens";
 
 export default function CheckoutPage() {
   const [cart, setCart] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  if (!token || token && isTokenExpired(token)) {
-    router.push('/login');
+  if (!token || (token && isTokenExpired(token))) {
+    router.push("/login");
     return;
   }
 
@@ -27,7 +28,7 @@ export default function CheckoutPage() {
         const data = await res.json();
         setCart(data.items);
       } catch (err) {
-        console.error('Error fetching cart:', err);
+        console.error("Error fetching cart:", err);
       } finally {
         setLoading(false);
       }
@@ -35,12 +36,15 @@ export default function CheckoutPage() {
 
     if (token) fetchCart();
     else {
-      alert('Please login to proceed to checkout.');
-      router.push('/login');
+      alert("Please login to proceed to checkout.");
+      router.push("/login");
     }
   }, [token, router]);
 
-  const total = cart.reduce((sum, item) => sum + item.productId.price, 0);
+  const total = cart.reduce(
+    (sum, item) => sum + item.productId.price * item.quantity,
+    0
+  );
 
   const handleCheckout = async () => {
     try {
@@ -52,24 +56,27 @@ export default function CheckoutPage() {
         })),
       };
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (res.ok) {
-        alert('Order placed successfully!');
-        router.push('/orders');
+        alert("Order placed successfully!");
+        router.push("/orders");
       } else {
-        alert('Failed to place order.');
+        alert("Failed to place order.");
       }
     } catch (error) {
-      console.error('Checkout error:', error);
-      alert('Something went wrong!');
+      console.error("Checkout error:", error);
+      alert("Something went wrong!");
     }
   };
 
@@ -83,10 +90,14 @@ export default function CheckoutPage() {
       ) : (
         <div className="space-y-4">
           {cart.map((item) => (
-            <div key={item.productId._id} className="flex justify-between items-center border p-4 rounded">
+            <div
+              key={item.productId._id}
+              className="flex justify-between items-center border p-4 rounded"
+            >
               <div>
                 <h2 className="font-bold">{item.productId.name}</h2>
                 <p>${item.productId.price}</p>
+                <p>Quantity: {item.quantity}</p>
               </div>
             </div>
           ))}

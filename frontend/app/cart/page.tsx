@@ -63,7 +63,7 @@ export default function CartPage() {
     }
   };
 
-  const total = (cart ?? []).reduce((sum, p) => sum + p.productId.price, 0);
+  const total = (cart ?? []).reduce((sum, p) => sum + (p.productId.price * p.quantity), 0);
 
   if (loading) return <p className="p-6">Loading cart...</p>;
 
@@ -90,6 +90,7 @@ export default function CartPage() {
               <div>
                 <h2 className="font-bold">{item.productId.name}</h2>
                 <p>${item.productId.price}</p>
+                <p>Quantity: {item.quantity}</p>
               </div>
               <button
                 onClick={() => removeFromCart(item.productId._id)}
