@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { isTokenExpired } from '../utils/tokens';
+import { AxiosError } from 'axios';
 
 type Spender = {
   userid: number;
@@ -34,7 +35,8 @@ const TopSpendersPage = () => {
         const data = await res.json();
         setSpenders(data);
       } catch (err) {
-        setError('Could not load top spenders');
+        const error = err as AxiosError<{ message: string }>;
+        setError(error.response?.data?.message || 'Could not load top spenders');
       }
     };
 

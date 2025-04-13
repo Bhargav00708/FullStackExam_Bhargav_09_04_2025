@@ -37,7 +37,7 @@ export default function CartPage() {
     };
 
     if (token) fetchCart();
-  }, [token]);
+  }, [token, router]);
 
   const removeFromCart = async (productId: string) => {
     try {
